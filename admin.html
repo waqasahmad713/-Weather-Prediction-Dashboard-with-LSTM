@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --success: #48bb78;
+            --error: #f56565;
+            --warning: #ed8936;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Particle Background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+            margin: 20px;
+            opacity: 0;
+            transform: translateY(-50px);
+            animation: slideInDown 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes slideInDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+            to { text-shadow: 0 4px 30px rgba(255, 255, 255, 0.4); }
+        }
+
+        /* Admin Container */
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Navigation */
+        .admin-nav {
+            display: flex;
+            margin-bottom: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 1s ease-out 0.7s forwards;
+        }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .admin-nav a {
+            padding: 20px 30px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .admin-nav a:hover::before {
+            left: 100%;
+        }
+
+        .admin-nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .admin-nav a.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            color: white;
+        }
+
+        /* Glass Sections */
+        .admin-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .admin-section:nth-child(2) { animation: fadeInUp 1s ease-out 0.9s forwards; }
+        .admin-section:nth-child(3) { animation: fadeInUp 1s ease-out 1.1s forwards; }
+        .admin-section:nth-child(4) { animation: fadeInUp 1s ease-out 1.3s forwards; }
+        .admin-section:nth-child(5) { animation: fadeInUp 1s ease-out 1.5s forwards; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .admin-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Upload Cards Container */
+        .upload-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .upload-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .upload-card:hover::before {
+            left: 100%;
+        }
+
+        .upload-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            color: white;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--glass-border);
+            font-size: 24px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            border-radius: 2px;
+        }
+
+        /* Forms */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        input[type="file"] {
+            padding: 16px;
+            border: 2px dashed var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        input[type="file"]:hover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.3);
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(240, 147, 251, 0.4);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        /* Status Messages */
+        .status-message {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .success {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .error {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--error);
+            border-color: var(--error);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+            color: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            font-weight: 600;
+            font-size: 16px;
+            position: sticky;
+            top: 0;
+        }
+
+        tr {
+            transition: all 0.3s ease;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.01);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 0 15px;
+            }
+
+            header {
+                margin: 15px;
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .upload-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .admin-nav {
+                flex-direction: column;
+            }
+
+            .admin-nav a {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+
+            .admin-section, .upload-card {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+        }
+
+        /* Scroll Reveal Animation */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Particle Background -->
+    <div class="particles" id="particles"></div>
+
+    <header>
+        <h1>Weather Forecast Admin Panel</h1>
+        <div id="current-time"></div>
+    </header>
+
+    <div class="admin-container">
+        <div class="admin-nav">
+            <a href="/">Public Dashboard</a>
+            <a href="#" class="active">Admin Panel</a>
+        </div>
+
+        <!-- Upload Cards in One Row -->
+        <div class="upload-container">
+            <div class="upload-card">
+                <h2 class="section-title">Upload JSON Data</h2>
+                <form id="json-upload-form">
+                    <input type="file" id="json-file" accept=".json">
+                    <button type="submit">Upload JSON</button>
+                </form>
+                <div id="json-upload-status" class="status-message"></div>
+            </div>
+
+            <div class="upload-card">
+                <h2 class="section-title">Upload CSV Data</h2>
+                <form id="csv-upload-form">
+                    <input type="file" id="csv-file" accept=".csv">
+                    <button type="submit">Upload CSV</button>
+                </form>
+                <div id="csv-upload-status" class="status-message"></div>
+            </div>
+        </div>
+
+        <div class="admin-section table-container">
+            <h2 class="section-title">Recent Data (Last 50 Records)</h2>
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Temp (°C)</th>
+                        <th>Humidity (%)</th>
+                        <th>Wind (km/h)</th>
+                        <th>Rain (mm)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Manual Prediction</h2>
+            <button id="trigger-prediction">Run Prediction Now</button>
+            <div id="prediction-status" class="status-message"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Loading screen
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('fade-out');
+                createParticles();
+            }, 1000);
+        });
+
+        // Current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        // Update time every second
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // JSON upload handler
+        document.getElementById('json-upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('json-file');
+            const status = document.getElementById('json-upload-status');
+            
+            if (!fileInput.files.length) {
+                status.textContent = "Please select a JSON file";
+                status.className = 'status-message error';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                status.textContent = "Uploading JSON...";
+                status.className = 'status-message';
+                
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    status.textContent = result.message;
+                    status.className = 'status-message success';
+                    loadDataLogs();
+                } else {
+                    status.textContent = result.error || "JSON upload failed";
+                    status.className = 'status-message error';
+                }
+            } catch (error) {
+                status.textContent = "Error uploading JSON";
+                status.className = 'status-message error';
+                console.error(error);
+            }
+        });
+
+        // CSV upload handler
+        document.getElementById('csv-upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('csv-file');
+            const status = document.getElementById('csv-upload-status');
+            
+            if (!fileInput.files.length) {
+                status.textContent = "Please select a CSV file";
+                status.className = 'status-message error';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                status.textContent = "Uploading CSV...";
+                status.className = 'status-message';
+                
+                const response = await fetch('/api/upload-csv', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    status.textContent = result.message;
+                    status.className = 'status-message success';
+                    loadDataLogs();
+                } else {
+                    status.textContent = result.error || "CSV upload failed";
+                    status.className = 'status-message error';
+                }
+            } catch (error) {
+                status.textContent = "Error uploading CSV";
+                status.className = 'status-message error';
+                console.error(error);
+            }
+        });
+
+        // Trigger prediction
+        document.getElementById('trigger-prediction').addEventListener('click', async () => {
+            const status = document.getElementById('prediction-status');
+            status.textContent = "Running prediction...";
+            status.className = 'status-message';
+            
+            try {
+                const response = await fetch('/api/predict', { method: 'POST' });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    status.textContent = result.message;
+                    status.className = 'status-message success';
+                } else {
+                    status.textContent = result.message || "Prediction failed";
+                    status.className = 'status-message error';
+                }
+            } catch (error) {
+                status.textContent = "Error triggering prediction";
+                status.className = 'status-message error';
+                console.error(error);
+            }
+        });
+
+        // Load data logs
+        async function loadDataLogs() {
+            try {
+                const response = await fetch('/api/data-logs');
+                const data = await response.json();
+                
+                const tableBody = document.querySelector('#data-table tbody');
+                tableBody.innerHTML = '';
+                
+                data.forEach((entry, index) => {
+                    const row = document.createElement('tr');
+                    const date = new Date(entry.datetime);
+                    const formattedDate = date.toLocaleString();
+                    
+                    row.innerHTML = `
+                        <td>${formattedDate}</td>
+                        <td>${entry.temp.toFixed(1)}</td>
+                        <td>${entry.humidity.toFixed(1)}</td>
+                        <td>${entry.wind_speed.toFixed(1)}</td>
+                        <td>${entry.rain.toFixed(1)}</td>
+                    `;
+                    
+                    // Add staggered animation
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        row.style.transition = 'all 0.5s ease';
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateY(0)';
+                    }, index * 50);
+                    
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading data logs:', error);
+            }
+        }
+
+        // Initialize
+        loadDataLogs();
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+:root {
+    --primary: #1a73e8;
+    --secondary: #34a853;
+    --danger: #ea4335;
+    --warning: #fbbc05;
+    --dark: #202124;
+    --light: #f8f9fa;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    color: var(--dark);
+    line-height: 1.7;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 32px 25px 28px 25px;
+    background: linear-gradient(90deg, #fff 60%, #e3f0ff 100%);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+    position: relative;
+}
+
+h1 {
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-size: 2.8rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    border-bottom: 2px solid #f0f3f7;
+    padding-bottom: 12px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.current-weather {
+    background: white;
+    border-radius: 16px;
+    padding: 32px 28px;
+    margin-bottom: 32px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+    border: 1.5px solid #e3eaf5;
+}
+
+.weather-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 36px 32px;
+    background: linear-gradient(135deg, #1a73e8 60%, #34a853 100%);
+    color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    transition: box-shadow 0.2s;
+}
+.weather-card:hover {
+    box-shadow: 0 12px 32px rgba(26, 115, 232, 0.18);
+}
+
+.temp {
+    font-size: 4rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+#weather-icon {
+    font-size: 5.5rem;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
+}
+
+.details > div {
+    margin: 18px 0;
+    font-size: 1.25rem;
+    letter-spacing: 0.2px;
+    padding-left: 8px;
+    border-left: 3px solid rgba(255,255,255,0.18);
+}
+
+.chart-container {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 25px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+    position: relative;
+    height: 340px;
+    border: 1.5px solid #e3eaf5;
+}
+
+.data-table {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 25px;
+    margin-top: 32px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+    overflow-x: auto;
+    border: 1.5px solid #e3eaf5;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 1.08rem;
+}
+
+th, td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+    background: linear-gradient(90deg, var(--primary) 80%, #34a853 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    font-size: 1.13rem;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #e3f2fd;
+    transition: background 0.2s;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+    .weather-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+        padding: 28px 12px;
+    }
+    .temp {
+        margin-bottom: 18px;
+    }
+    .chart-container {
+        height: 260px;
+        padding: 18px 5px;
+    }
+    header {
+        padding: 12px 5px;
+    }
+    h1 {
+        font-size: 1.7rem;
+    }
+}
+
+#current-time {
+    font-size: 1.18rem;
+    color: #666;
+    margin-top: 8px;
+    letter-spacing: 0.2px;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    vertical-align: text-bottom;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border .75s linear infinite;
+    margin-top: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    background: #e3eaf5;
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #b3c6e6;
+    border-radius: 8px;
+}
